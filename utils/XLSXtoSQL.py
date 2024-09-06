@@ -1,8 +1,15 @@
+import pandas as pd
 import mysql.connector
 from mysql.connector import Error
-class SQL_Object:
+class Convert_Object:
     def __init__(self):
         self.__connexion = None
+        self.__dict_data = None
+    def convert_XLSX(self,path:str):
+        df = pd.read_excel(path)
+        self.__dict_data = df.to_dict(orient='records')
+    def get_dict(self):
+        return self.__dict_data
     def connect(self,hostname:str,username:str,password:str):
         try:
             self.__connexion = mysql.connector.connect(
@@ -34,7 +41,9 @@ class SQL_Object:
             print(f"Database error\nDetails :\n'{err}'")
 
 
-def convert(hostname:str,username:str,password:str,db_name:str):
-    Object = SQL_Object()
+def convert(path:str,hostname:str,username:str,password:str,db_name:str):
+    Object = Convert_Object()
+    Object.convert_XLSX(path)
     Object.connect(hostname,username,password)
     Object.db_link(db_name)
+    print(Object.get_dict())
